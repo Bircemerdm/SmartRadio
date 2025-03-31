@@ -1,0 +1,95 @@
+/* Container için stil */
+.search-form-container {
+    max-width: 400px;
+    /* Genişliği küçülttük */
+    margin: 20px 0;
+    /* Sadece üst ve alt margin */
+    padding: 15px;
+    /* Daha küçük padding */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #000000d4;
+    margin-left: 0;
+    /* Sol tarafı sıfırlıyoruz */
+    margin-right: auto;
+    /* Sağ tarafı otomatik ayarlıyoruz */
+}
+
+/* Başlık stil */
+.search-form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    /* Başlık altındaki boşluğu küçülttük */
+}
+
+/* Hata mesajı */
+.error-message {
+    color: red;
+    text-align: center;
+    margin-bottom: 15px;
+    /* Daha küçük margin */
+    padding: 8px;
+    /* Daha küçük padding */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
+
+/* Form elemanları için stil */
+.form-group {
+    margin-bottom: 15px;
+    /* Daha küçük margin */
+}
+
+.form-group label {
+    font-size: 12px;
+    /* Daha küçük font */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    /* Daha küçük padding */
+    font-size: 14px;
+    /* Daha küçük font */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Submit butonunun stilini ayarlama */
+.submit-container {
+    display: flex;
+    justify-content: center;
+}
+
+.submit-container button {
+    width: 180px;
+    /* Butonun genişliğini küçülttük */
+    padding: 8px;
+    /* Daha küçük padding */
+    font-size: 14px;
+    /* Daha küçük font */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-container button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+.submit-container button:hover {
+    background-color: #0056b3;
+}
