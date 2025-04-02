@@ -7,23 +7,27 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# Spotify API kimlik bilgileri
+# 🎵 Spotify API Bilgileri
 CLIENT_ID = "dd3944f5c5a94e628abe0d5de46e8f50"
 CLIENT_SECRET = "39c4d17d8c1645479dfd7710ef455650"
 TOKEN_URL = "https://accounts.spotify.com/api/token"
 SEARCH_URL = "https://api.spotify.com/v1/search"
 
-# CSV dosyasını yükle
+# 📌 CSV Dosyasını Yükle ve Küçük Harfe Çevir
 def load_data():
     try:
         data = pd.read_csv("dataset1.csv", sep=",")
+        data.columns = data.columns.str.lower()  # Sütun adlarını küçük harfe çevir
+        print("Veri setindeki sütunlar:", data.columns.tolist())  
+        print("İlk 5 satır:\n", data.head())  
+        print("Mevcut türler:", data['track_genre'].unique()[:10])  # İlk 10 türü yazdır
         return data
     except Exception as e:
         print(f"Veri yüklenirken hata oluştu: {e}")
         return None
 
+# 🎫 Spotify Token Alma
 def get_access_token():
-    """Spotify Access Token al."""
     auth_str = f"{CLIENT_ID}:{CLIENT_SECRET}"
     b64_auth_str = base64.b64encode(auth_str.encode()).decode()
     headers = {"Authorization": f"Basic {b64_auth_str}"}
@@ -36,8 +40,8 @@ def get_access_token():
         print("Access token alınamadı:", response.json())
         return None
 
+# 🔍 Spotify'da Şarkı Arama
 def get_spotify_link(query, access_token):
-    """Spotify'da şarkı ara ve bağlantıları döndür."""
     headers = {"Authorization": f"Bearer {access_token}"}
     params = {"q": query, "type": "track", "limit": 1}
     response = requests.get(SEARCH_URL, headers=headers, params=params)
@@ -52,14 +56,15 @@ def get_spotify_link(query, access_token):
             }
     return None
 
+# 🌍 CORS Yanıtlarını Yönet
 @app.after_request
 def after_request(response):
-    """Her yanıtın ardından CORS başlıklarını ekle."""
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return response
 
+# 🎧 Şarkı Arama API'si
 @app.route('/api/search', methods=['GET', 'POST', 'OPTIONS'])
 def search():
     if request.method == 'OPTIONS':
@@ -69,19 +74,17 @@ def search():
     if data is None:
         return jsonify({"message": "Veri yüklenemedi. Lütfen CSV dosyanızı kontrol edin."}), 400
 
-    # `GET` yöntemiyle gelen sorgu parametrelerini al
+    # 🟢 GET ve POST Yöntemleri İçin Parametreleri Al
     if request.method == 'GET':
         artist = request.args.get('artist', "")
         album = request.args.get('album', "")
         genre = request.args.get('genre', "")
-
-    # `POST` yöntemiyle gelen JSON verilerini al
     elif request.method == 'POST':
         artist = request.json.get('artist', "")
         album = request.json.get('album', "")
         genre = request.json.get('genre', "")
 
-    # Filtreleme işlemi
+    # 🛠 Filtreleme
     filtered_data = data
     if artist:
         filtered_data = filtered_data[filtered_data['artists'].str.contains(artist, case=False, na=False)]
@@ -90,12 +93,19 @@ def search():
     if genre:
         filtered_data = filtered_data[filtered_data['track_genre'].str.contains(genre, case=False, na=False)]
 
-    # Spotify Token Al
+    # 🔍 Eğer Hiç Şarkı Bulunmazsa
+    if filtered_data.empty:
+        return jsonify({"message": "Eşleşen şarkı bulunamadı!"}), 404
+
+    # 🔥 Hız İçin İlk 5 Sonucu Al
+    filtered_data = filtered_data.head(5)
+
+    # 🎫 Spotify Token Al
     access_token = get_access_token()
     if not access_token:
         return jsonify({"message": "Spotify token alınamadı. Lütfen API bilgilerinizi kontrol edin."}), 500
 
-    # Sonuçlar
+    # 📜 Sonuçları Döndür
     results = []
     for _, row in filtered_data.iterrows():
         query = f"{row['track_name']} {row['artists']}"
@@ -111,5 +121,6 @@ def search():
 
     return jsonify(results), 200
 
+# 🚀 Flask Uygulamasını Başlat
 if __name__ == '__main__':
     app.run(debug=True)
